@@ -1,0 +1,36 @@
+{
+  "name": "weworktask",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run": "ts-node ./src/index",
+    "behttp": "ts-node ./src/BeHttpTest",
+    "transformGroup": "ts-node ./src/transformGroupUtil",
+    "transformGroupnew": "ts-node ./src/transformGroup",
+    "getSql": "ts-node ./src/generatorSql",
+    "setAlias": "ts-node ./src/setAliasName",
+    "chazhi": "ts-node ./src/chazhi",
+    "setAdmin": "ts-node ./src/resetAdmin",
+    "aes": "ts-node ./src/aes",
+    "create": "ts-node ./src/minsu/minsuCreate",
+    "getQrCode": "ts-node ./src/minsu/minsuCreateQrCode",
+    "downloadQrCode": "ts-node ./src/minsu/minsuDownloadQrCode",
+    "car": "ts-node ./src/car/car"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node-xlsx": "^0.15.0",
+    "axios": "^0.20.0",
+    "mos-mss": "^1.1.8",
+    "node-xlsx": "^0.15.0",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^16.7.8",
+    "excel4node": "^1.7.2"
+  }
+}

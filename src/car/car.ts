@@ -4,11 +4,12 @@ const excel4node = require('excel4node');
 import xlsx from 'node-xlsx';
 import {
   getMyData,
+  getNoStockForeverData,
   getPriceData,
   getStockData,
   IPriceData,
   IStockData,
-  root,
+  rootPath,
 } from './excelUtil';
 
 interface IExportData {
@@ -25,15 +26,18 @@ interface IExportData {
   beizhu?: string;
   bigCate?: string;
   path?: string;
+  isNeverStock?: string;
 }
 
 async function main() {
   const priceData = await getPriceData();
   const stockData = await getStockData();
+  const neverStockData = await getNoStockForeverData();
   const myData = await getMyData();
 
   const stockMap = parseStockMap(stockData);
   const priceMap = parsePriceMap(priceData);
+  const neverStockMap = parseStockMap(neverStockData);
 
   const exportDataList: IExportData[] = myData.map((data) => {
     const { productId, productName, bigCate, path, num, nowPrice } = data;
@@ -60,6 +64,13 @@ async function main() {
       exportData.cate = price.cate;
     }
 
+    const never: IStockData = neverStockMap[productId];
+    if (never) {
+      exportData.isNeverStock = '绝版'
+    } else {
+      exportData.isNeverStock = ''
+    }
+
     return exportData;
   });
 
@@ -69,7 +80,7 @@ async function main() {
 }
 
 const buildNewExcel = (exportDataList: IExportData[], fileName: string) => {
-  const filePath = path.resolve(root, fileName);
+  const filePath = path.resolve(rootPath, fileName);
   let wb = new excel4node.Workbook();
   const sheets = [
     '全集',
@@ -126,9 +137,9 @@ const buildNewExcel = (exportDataList: IExportData[], fileName: string) => {
               type: 'twoCellAnchor',
               from: {
                 col: 6,
-                colOff: 0,
+                colOff: '0.2in',
                 row: line,
-                rowOff: 0,
+                rowOff: '0.2in',
               },
               to: {
                 col: 6,
@@ -165,6 +176,7 @@ const buildNewExcel = (exportDataList: IExportData[], fileName: string) => {
         .string(row[11] + '')
         .style(myStyle);
       ws.cell(line, 13).link(row[12]).style(myStyle);
+      ws.cell(line, 14).string(row[13]).style(myStyle);
     }
   }
 
@@ -172,7 +184,7 @@ const buildNewExcel = (exportDataList: IExportData[], fileName: string) => {
 };
 
 const _findPicPath = (filePath: string) => {
-  const dir = path.resolve(root, filePath);
+  const dir = path.resolve(rootPath, filePath);
   const files = fs.readdirSync(dir);
 
   let newfiles = files.filter((file: any) => {
@@ -181,7 +193,7 @@ const _findPicPath = (filePath: string) => {
   console.log(files);
   console.log(newfiles);
   if (newfiles.length > 0) {
-    return path.resolve(root, filePath, newfiles[0]);
+    return path.resolve(rootPath, filePath, newfiles[0]);
   }
 };
 
@@ -204,6 +216,7 @@ const _prepareData = (
     '可用库存',
     '备注信息',
     '一键链接',
+    '是否绝版'
   ]);
   for (let i = 0; i < exportDataList.length; i++) {
     const exportData = exportDataList[i];
@@ -221,6 +234,7 @@ const _prepareData = (
       beizhu,
       bigCate,
       path,
+      isNeverStock
     } = exportData;
     if (bigCateFilter && bigCate != bigCateFilter) {
       continue;
@@ -239,6 +253,7 @@ const _prepareData = (
       +(storeUseNum || 0),
       beizhu || '',
       path || '',
+      isNeverStock || ''
     ]);
   }
   return data;

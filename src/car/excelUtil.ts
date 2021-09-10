@@ -29,11 +29,11 @@ export interface IMyData {
   path: string; //商品图片本地链接
 }
 
-// const root = '/Users/wangzidong/Documents/随时可删/小车处理';
-export const root = '/Users/gagaprince/Documents/临时存放随时可删/小车处理';
+export const rootPath = '/Users/wangzidong/Documents/随时可删/小车处理';
+// export const root = '/Users/gagaprince/Documents/临时存放随时可删/小车处理';
 
 export const getData = async (file: string = '2021年9月价格指导.xls') => {
-  const filePath = path.resolve(root, file);
+  const filePath = path.resolve(rootPath, file);
   console.log(filePath);
   const sheets = xlsx.parse(filePath);
   return sheets;
@@ -54,6 +54,27 @@ export const getMyData = async () => {
   console.log(myAllDataList);
   return myAllDataList;
 };
+
+export const getNoStockForeverData = async () => {
+  const stockOriginData1 = await getData('绝版1.xlsx');
+  const stockOriginData2 = await getData('绝版2.xlsx');
+  const stockOriginData3 = await getData('绝版3.xlsx');
+  const stockOriginData4 = await getData('绝版4.xlsx');
+  const stockSheetData = stockOriginData1[0].data
+    .concat(stockOriginData2[0].data)
+    .concat(stockOriginData3[0].data)
+    .concat(stockOriginData4[0].data);
+  // console.log(stockSheetData);
+  const allDataList: any[] = [];
+  stockSheetData.forEach((sheetData, index) => {
+    if (index > 3) {
+      allDataList.push(stockDataCreator(sheetData));
+    }
+  });
+
+  console.log(allDataList);
+  return allDataList;
+}
 
 export const getStockData = async () => {
   const stockOriginData = await getData('店小秘.xlsx');
